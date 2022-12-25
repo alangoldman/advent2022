@@ -6,8 +6,7 @@ file.close()
 
 lines = [l.strip() for l in lines]
 
-heightmap = [[0]*len(lines[0]) for i in range(len(lines))]
-visible = [[[True, True, True, True]]*len(lines[0]) for i in range(len(lines))]
+heightmap = np.zeros((len(lines), len(lines[0])), int)
 visible = np.ones((len(lines), len(lines[0]), 4), bool)
 
 
@@ -49,12 +48,35 @@ for i in range(1, len(lines[0])-1):
             #print(j, i, False, 'south')
         else:
             south_max = heightmap[j][i]
+
+def tree_score(heightmap, y, x):
+    score = 1
+    max_view = heightmap[y][x]
+    for dx, dy in [(-1, 0), (1, 0), (0, 1), (0, -1)]:
+        j = y + dy
+        i = x + dx
+        dist = 0
+        while j >= 0 and j < len(lines) and i >= 0 and i < len(lines[0]):
+            dist += 1
+            if heightmap[j][i] >= max_view:
+                break
+            j += dy
+            i += dx
+        
+        score *= dist
+    return score
             
 count = 0
-for j in range(len(lines)):
-    for i in range(len(lines[0])):
+best = None
+for j in range(1, len(lines)-1):
+    for i in range(1, len(lines[0])-1):
         if (any(visible[j][i])):
             count += 1
-            
+            score = tree_score(heightmap, j, i)
+            if best is None or score > best[0]:
+                best = (score, j, i)
+                
 print(count)
+print(best)
 #print(visible)
+#print(heightmap)
