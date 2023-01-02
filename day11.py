@@ -18,8 +18,10 @@ for i in range(0, len(lines)):
         false_monkey = int(lines[i+5][26:])
         monkeys.append([held, op, operand, test, true_monkey, false_monkey, 0])
         i += 5
+
+divsor = int(np.prod([m[3] for m in monkeys]))
         
-for r in range(1, 21):
+for r in range(1, 10001):
     for i in range(len(monkeys)):
         held, op, operand, test, true_monkey, false_monkey, inspections = monkeys[i]
         for item in held:
@@ -31,7 +33,8 @@ for r in range(1, 21):
                 item *= op2
             elif op == '+':
                 item += op2
-            item = int(item / 3)
+            #item = int(item / 3)
+            item %= divsor
             
             if item % test == 0:
                 monkeys[true_monkey][0].append(item)
