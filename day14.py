@@ -29,9 +29,12 @@ for line in lines:
             else:
                 print("shouldn't be here")
         prev_point = x, y
+grid[max_depth+2, :] = True
 
+#print(grid[0:13, 495:505])
 count = 0
-while True:
+last = (1, 500)
+while last != (0, 500):
     cur = 0, 500
     settled = False
     while not settled and cur[0] < grid.shape[0]-1:
@@ -46,7 +49,9 @@ while True:
         grid[cur] = True
         count += 1
     else:
+        print("shouldn't be here in part 2!")
         break
+    last = cur
 
 print(count)
-print(grid[0:10, 495:505])
+print(grid[0:11, 495:505])
