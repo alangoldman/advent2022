@@ -37,10 +37,11 @@ for k in range(0, len(valve_list)):
 
 
 queue = list()
-seen = set()
+seen = {}
 # steps, score, position, opened valves
 queue.append((26, 26, 0, 'AA', 'AA', set()))
-#seen.add((0, 'AA', 'AA', ''))
+# max_steps, pos, pos, opened valves (string): score
+seen[((26, 'AA', 'AA', ''))] = 0
 best = 0
 print(graph)
 
@@ -72,9 +73,11 @@ while len(queue)>0:
                 continue
             score2 = score + steps2 * graph[valve][0]
             valves2 = valves.union(set([valve]))
-            #if (score2, valve, cur_e, set_to_string(valves2)) not in seen:
-                #seen.add((score2, valve, cur_e, set_to_string(valves2)))
-            next_moves.append((steps2, steps_e, score2, valve, cur_e, valves2))
+            pos = sorted([valve, cur_e])
+            key = (max(steps, steps_e), pos[0], pos[1], set_to_string(valves2))
+            if key not in seen or seen[key] < score2:
+                seen[key] = score2
+                next_moves.append((steps2, steps_e, score2, valve, cur_e, valves2))
                 
     flow, adj, index = graph[cur_e]
     for valve in graph.keys():
@@ -84,12 +87,16 @@ while len(queue)>0:
                 continue
             score2 = score + steps2 * graph[valve][0]
             valves2 = valves.union(set([valve]))
-            #if (score2, cur, valve, set_to_string(valves2)) not in seen:
-                #seen.add((score2, cur, valve, set_to_string(valves2)))
-            next_moves.append((steps, steps2, score2, cur, valve, valves2))
+            pos = sorted([cur, valve])
+            key = (max(steps, steps_e), pos[0], pos[1], set_to_string(valves2))
+            if key not in seen or seen[key] < score2:
+                seen[key] = score2
+                next_moves.append((steps, steps2, score2, cur, valve, valves2))
                
-    if len(next_moves) == 0:
-        best = max(best, score)
+    if len(next_moves) == 0 and score > best:
+        best = score
+        print('New best!', best, ',memo size:', len(seen.keys()))
+    #next_moves = sorted(next_moves, key=lambda x: x[2]+best_possible_remaining_score(max(x[0], x[1]), x[3]), reverse=True)
     next_moves = sorted(next_moves, key=lambda x: x[2], reverse=True)
     queue += next_moves
 
